@@ -1,0 +1,11 @@
+{
+  "name": "bakery",
+  "version": "1.0.0",
+  "description": "Project",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon –quiet"
+  },
+  "author": "Deny",
+  "license": "ISC"
+}
