@@ -49,6 +49,8 @@ model Property {
   host          Host      @relation(fields: [hostId], references: [id])
   bookings      Booking[]
   reviews       Review[]
+
+  @@index([hostId])
 }
 
 model Booking {
@@ -63,6 +65,9 @@ model Booking {
 
   user           User     @relation(fields: [userId], references: [id])
   property       Property @relation(fields: [propertyId], references: [id])
+
+  @@index([userId])
+  @@index([propertyId])
 }
 
 model Review {
@@ -74,4 +79,7 @@ model Review {
 
   user       User     @relation(fields: [userId], references: [id])
   property   Property @relation(fields: [propertyId], references: [id])
+
+  @@index([userId])
+  @@index([propertyId])
 }

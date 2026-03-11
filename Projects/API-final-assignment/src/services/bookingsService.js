@@ -1,7 +1,19 @@
 import { prisma } from "../prismaClient.js";
 
-export async function getAllBookings() {
-  return prisma.booking.findMany();
+function buildBookingFilters(query) {
+  const where = {};
+
+  if (query.userId) {
+    where.userId = query.userId;
+  }
+
+  return where;
+}
+
+export async function getAllBookings(query = {}) {
+  return prisma.booking.findMany({
+    where: buildBookingFilters(query),
+  });
 }
 
 export async function getBookingById(id) {

@@ -9,8 +9,21 @@ const userSelectWithoutPassword = {
   pictureUrl: true,
 };
 
-export async function getAllUsers() {
-  return prisma.user.findMany({ select: userSelectWithoutPassword });
+function buildUserFilters(query) {
+  const where = {};
+
+  if (query.username) {
+    where.username = query.username;
+  }
+
+  return where;
+}
+
+export async function getAllUsers(query = {}) {
+  return prisma.user.findMany({
+    where: buildUserFilters(query),
+    select: userSelectWithoutPassword,
+  });
 }
 
 export async function getUserById(id) {
@@ -26,7 +39,6 @@ export async function updateUser(id, data) {
 }
 
 export async function deleteUser(id) {
-  // delete dependent rows first
   return prisma.$transaction(async (tx) => {
     await tx.review.deleteMany({ where: { userId: id } });
     await tx.booking.deleteMany({ where: { userId: id } });

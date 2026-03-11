@@ -5,8 +5,27 @@ const propertyInclude = {
   reviews: true,
 };
 
-export async function getAllProperties() {
+function buildPropertyFilters(query) {
+  const where = {};
+
+  if (query.location) {
+    where.location = query.location;
+  }
+
+  if (query.pricePerNight !== undefined) {
+    const pricePerNight = Number(query.pricePerNight);
+
+    if (!Number.isNaN(pricePerNight)) {
+      where.pricePerNight = pricePerNight;
+    }
+  }
+
+  return where;
+}
+
+export async function getAllProperties(query = {}) {
   return prisma.property.findMany({
+    where: buildPropertyFilters(query),
     include: propertyInclude,
   });
 }

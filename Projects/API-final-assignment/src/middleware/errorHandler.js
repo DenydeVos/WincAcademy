@@ -2,24 +2,24 @@ import * as Sentry from "@sentry/node";
 import { Prisma } from "@prisma/client";
 
 export function errorHandler(err, req, res, next) {
-  // report
   try {
     Sentry.captureException(err);
   } catch (_) {
-    // ignore
+    // ignore reporting errors
   }
 
-  // Prisma validation / known request errors should be treated as bad request
   if (err instanceof Prisma.PrismaClientValidationError) {
     return res.status(400).json({ message: "Bad request" });
   }
 
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
-    // e.g. unique constraint, missing relation
+    if (err.code === "P2002") {
+      return res.status(409).json({ message: "Resource already exists" });
+    }
+
     return res.status(400).json({ message: "Bad request" });
   }
 
-  // If the route already set a status (rare), honor it
   if (res.headersSent) {
     return next(err);
   }

@@ -11,8 +11,19 @@ const hostSelectWithoutPassword = {
   listings: true,
 };
 
-export async function getAllHosts() {
+function buildHostFilters(query) {
+  const where = {};
+
+  if (query.name) {
+    where.name = query.name;
+  }
+
+  return where;
+}
+
+export async function getAllHosts(query = {}) {
   return prisma.host.findMany({
+    where: buildHostFilters(query),
     select: hostSelectWithoutPassword,
   });
 }
@@ -32,7 +43,7 @@ export async function updateHost(id, data) {
 export async function deleteHost(id) {
   return prisma.$transaction(async (tx) => {
     const properties = await tx.property.findMany({ where: { hostId: id }, select: { id: true } });
-    const propertyIds = properties.map((p) => p.id);
+    const propertyIds = properties.map((property) => property.id);
 
     if (propertyIds.length > 0) {
       await tx.review.deleteMany({ where: { propertyId: { in: propertyIds } } });
